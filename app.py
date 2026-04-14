@@ -30,7 +30,7 @@ def load_metrics():
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_dashboard(request: Request):
-    """Serves the aesthetic main dashboard website."""
+    """Serves main dashboard website."""
     metrics = load_metrics()
     return templates.TemplateResponse(
         request=request,
@@ -42,7 +42,7 @@ async def serve_dashboard(request: Request):
 async def make_prediction(request: Request, amount: float = Form(...), v1: float = Form(...)):
     """Receives user input from the dashboard, runs ML inference, and renders results."""
     if model is None:
-        return HTMLResponse(content="<h3>Error: Model not found! Please run `python main.py` to train one.</h3>")
+        return HTMLResponse(content="<h3>Error: Model not found! Please run `python main.py` first.</h3>")
         
     try:
         expected_columns = model.feature_names_in_
@@ -72,5 +72,4 @@ async def make_prediction(request: Request, amount: float = Form(...), v1: float
 if __name__ == "__main__":
     print("Starting Fraud Detection API on 👉 http://localhost:8000")
     print("Press CTRL+C to quit.")
-    # Passing the app string ensures `reload=True` doesn't crash on windows!
     uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)

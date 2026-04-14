@@ -9,29 +9,13 @@ from src.features import engineer_features, balance_data
 from src.train import train_models, save_model
 from src.evaluate import evaluate_models, print_evaluation
 
-def generate_dummy_data(filepath="data/creditcard.csv"):
-    """Creates a basic dummy dataset if the real creditcard.csv doesn't exist to test pipeline execution."""
-    print("No dataset provided! Creating dummy 'data/creditcard.csv' for testing...")
-    os.makedirs(os.path.dirname(filepath), exist_ok=True)
-    np.random.seed(42)
-    # Simulate high class imbalance: 990 legit (0) and 10 fraud (1)
-    df = pd.DataFrame({
-        'Time': np.linspace(10, 100000, 1000),
-        'Amount': np.random.exponential(scale=50, size=1000),
-        'V1': np.random.randn(1000),
-        'V2': np.random.randn(1000),
-        'Class': [0]*990 + [1]*10
-    })
-    df.to_csv(filepath, index=False)
-    return filepath
-
 def run_pipeline():
     print("🚀 Starting Credit Card Fraud Detection Pipeline...")
     
     # 0. Load Raw Data
     data_path = "data/creditcard.csv"
     if not os.path.exists(data_path):
-        generate_dummy_data(data_path)
+        raise FileNotFoundError(f"Dataset not found at {data_path}. Please place the creditcard.csv file there or run `generate_dummy_data()` to create a dummy dataset for testing.")
     
     print("\n[1/5] Loading and Preprocessing Data...")
     df = pd.read_csv(data_path)
@@ -65,10 +49,8 @@ def run_pipeline():
     
     with open("models/metrics.json", "w") as f:
         json.dump(results, f)
-    
-    # 5. Save the best model
-    # Usually you'd pick based on best F1 score programmatically, 
-    # but XGBoost reliably wins for fraud tasks!
+     
+    # XGBoost reliably wins for fraud tasks!
     best_model_name = "XGBoost" 
     print(f"\n💾 Saving {best_model_name} for the API...")
     save_model(models[best_model_name])

@@ -2,7 +2,7 @@ from sklearn.metrics import precision_score, recall_score, f1_score, roc_auc_sco
 
 def evaluate_models(models, X_test, y_test):
     """
-    Evaluate trained models using the most robust metrics for fraud detection.
+    Evaluate trained models using the best metrics for fraud detection.
     Accuracy is omitted because in a 99% legit dataset, predicting 'safe' always gives 99% accuracy!
     """
     results = {}
