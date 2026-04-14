@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fraud Detection Dashboard</title>
+    <!-- Modern Google Font: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { 
+            background-color: #f8fafc; /* Beautiful clean slate background */
+            padding-top: 50px; 
+            font-family: 'Inter', sans-serif; 
+            color: #334155;
+        }
+        .container { max-width: 760px; }
+        
+        /* Modern Cards - no ugly gradients, just subtle drop shadows & heavy rounding */
+        .main-card { 
+            padding: 40px; 
+            border: none; 
+            border-radius: 28px; /* High rounding for aesthetic look */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.03); 
+            background: white; 
+        }
+        
+        .metric-card {
+            border-radius: 20px;
+            border: 1px solid #f1f5f9;
+            background-color: #ffffff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+            transition: transform 0.2s;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Inputs and Buttons - Fully rounded */
+        .form-control {
+            border-radius: 14px;
+            padding: 14px 18px;
+            border: 1px solid #e2e8f0;
+            background-color: #f8fafc;
+            transition: all 0.2s;
+        }
+        
+        .form-control:focus {
+            background-color: #ffffff;
+            border-color: #94a3b8;
+            box-shadow: 0 0 0 4px rgba(148, 163, 184, 0.15);
+        }
+
+        /* Sleek solid buttons */
+        .btn-primary { 
+            background-color: #0f172a; 
+            border: none; 
+            padding: 16px; 
+            font-weight: 600; 
+            border-radius: 16px; 
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary:hover { 
+            background-color: #334155; 
+            transform: translateY(-1px);
+        }
+
+        label { font-weight: 500; color: #64748b; font-size: 0.95rem; margin-bottom: 10px; }
+        
+        /* Seamless Nav Tabs */
+        .nav-tabs {
+            border-bottom: 2px solid #f1f5f9;
+        }
+        .nav-tabs .nav-link { 
+            font-weight: 600; 
+            color: #94a3b8; 
+            border: none; 
+            padding: 14px 24px;
+            border-bottom: 2px solid transparent; 
+            transition: all 0.2s;
+        }
+        .nav-tabs .nav-link:hover {
+            color: #475569;
+        }
+        .nav-tabs .nav-link.active { 
+            color: #0f172a; 
+            background-color: transparent; 
+            border-bottom: 2px solid #0f172a; 
+        }
+
+        /* Alerts - heavily rounded, subtle solid colors */
+        .alert-custom {
+            border-radius: 20px;
+            border: none;
+        }
+        .bg-danger-subtle { background-color: #fef2f2 !important; color: #b91c1c !important; }
+        .bg-success-subtle { background-color: #f0fdf4 !important; color: #15803d !important; }
+        
+        h2 { font-weight: 700; letter-spacing: -0.8px; color: #0f172a; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-card">
+            <h2 class="text-center mb-1">💳 Fraud Sentinel</h2>
+            <p class="text-center text-muted mb-4 pb-2" style="font-weight: 500;">ML-Powered Transaction Analysis</p>
+            
+            <!-- Custom Nav Tabs -->
+            <ul class="nav nav-tabs mb-4 justify-content-center" id="dashboardTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link {% if prediction is none %}active{% endif %}" id="metrics-tab" data-bs-toggle="tab" data-bs-target="#metrics-pane" type="button" role="tab">📊 Model Comparison</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link {% if prediction is not none %}active{% endif %}" id="predict-tab" data-bs-toggle="tab" data-bs-target="#predict-pane" type="button" role="tab">🔍 Test Transaction</button>
+              </li>
+            </ul>
+            
+            <!-- Tab Content -->
+            <div class="tab-content" id="dashboardTabsContent">
+              
+              <!-- Metrics Tab -->
+              <div class="tab-pane fade {% if prediction is none %}show active{% endif %}" id="metrics-pane" role="tabpanel" tabindex="0">
+                  {% if metrics %}
+                      {% for model_name, m in metrics.items() %}
+                      <div class="metric-card mb-4 p-4">
+                          <h5 class="mb-3" style="font-weight: 600; color: #334155;">{{ model_name }}</h5>
+                          <div class="row text-center mt-2">
+                              <div class="col">
+                                  <h6 class="text-muted" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Precision</h6>
+                                  <h4 style="font-weight: 700;" class="{% if m.get('Precision') > 0.7 %}text-success{% else %}text-danger{% endif %}">{{ "%.4f"|format(m.get('Precision', 0)) }}</h4>
+                              </div>
+                              <div class="col">
+                                  <h6 class="text-muted" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Recall</h6>
+                                  <h4 style="font-weight: 700;">{{ "%.4f"|format(m.get('Recall', 0)) }}</h4>
+                              </div>
+                              <div class="col">
+                                  <h6 class="text-muted" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">F1-Score</h6>
+                                  <h4 style="font-weight: 700;" class="{% if m.get('F1-Score') > 0.7 %}text-success{% else %}text-warning{% endif %}">{{ "%.4f"|format(m.get('F1-Score', 0)) }}</h4>
+                              </div>
+                              <div class="col">
+                                  <h6 class="text-muted" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">ROC-AUC</h6>
+                                  <h4 style="font-weight: 700;">{{ "%.4f"|format(m.get('ROC-AUC', 0)) }}</h4>
+                              </div>
+                          </div>
+                      </div>
+                      {% endfor %}
+                      
+                      <div class="alert alert-custom bg-light mt-4 p-4">
+                          <strong style="color: #334155;">What do these metrics mean?</strong>
+                          <ul class="mb-0 mt-3 text-muted" style="font-size: 0.95rem;">
+                              <li class="mb-2"><strong>Precision:</strong> When the model cries 'Fraud!', how often is it actually fraud. Low precision means angry customers experiencing false declines.</li>
+                              <li class="mb-2"><strong>Recall:</strong> Out of all REAL fraud cases, how many did the model catch.</li>
+                              <li><strong>F1-Score:</strong> The balanced harmonic average of Precision and Recall.</li>
+                          </ul>
+                      </div>
+                  {% else %}
+                      <div class="alert alert-custom bg-light text-center p-4">
+                          <p class="mb-0 text-muted" style="font-weight: 500;">Metrics not found. Please run <code>python main.py</code> first.</p>
+                      </div>
+                  {% endif %}
+              </div>
+              
+              <!-- Prediction Tab -->
+              <div class="tab-pane fade {% if prediction is not none %}show active{% endif %}" id="predict-pane" role="tabpanel" tabindex="0">
+                  <form action="/predict" method="post">
+                      <div class="mb-4">
+                          <label class="form-label">Transaction Amount ($)</label>
+                          <input type="number" step="0.01" name="amount" class="form-control" value="150.00" required>
+                      </div>
+                      <div class="mb-4">
+                          <label class="form-label">Behavior Anomaly Score (V1 Parameter)</label>
+                          <input type="number" step="0.0001" name="v1" class="form-control" value="-1.5" required>
+                      </div>
+                      <button type="submit" class="btn btn-primary w-100 mt-2">Analyze Transaction</button>
+                  </form>
+                  
+                  {% if prediction is not none %}
+                      {% if prediction == 1 %}
+                      <div class="mt-4 p-4 bg-danger-subtle text-center alert-custom shadow-sm border-0">
+                          <h4 class="fw-bold m-0 mb-1">🚨 FRAUD DETECTED</h4>
+                          <small style="font-weight: 500;">Transaction blocked immediately.</small>
+                      </div>
+                      {% else %}
+                      <div class="mt-4 p-4 bg-success-subtle text-center alert-custom shadow-sm border-0">
+                          <h4 class="fw-bold m-0 mb-1">✅ SAFE TRANSACTION</h4>
+                          <small style="font-weight: 500;">Transaction passes all behavioral parameters.</small>
+                      </div>
+                      {% endif %}
+                  {% endif %}
+              </div>
+              
+            </div>
+            
+            <div class="mt-5 text-center">
+                <small class="text-muted" style="font-weight: 500; letter-spacing: 0.5px;">POWERED BY FASTAPI & JINJA2</small>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

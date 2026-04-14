@@ -1,0 +1,23 @@
+# Python Virtual Environments
+.venv/
+venv/
+env/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+
+# Project Specific
+# (Ignoring data and models because datasets and large binary files should not be pushed to GitHub)
+data/
+models/
+
+# OS / Tooling
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+*.csv
