@@ -3,7 +3,10 @@ numpy
 scikit-learn
 xgboost
 imbalanced-learn
+joblib
 fastapi
 uvicorn
 python-multipart
 jinja2
+mlflow
+prometheus-client

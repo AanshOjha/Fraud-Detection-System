@@ -5,12 +5,14 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     """
     Basic data cleaning: drop missing values and scale monetary/time features.
     """
-    # Simply drop rows with missing values to keep it clean and robust
-    df = df.dropna()
-    
-    # Scale Time and Amount using RobustScaler to minimize the impact of extreme outliers
+    df = df.dropna().copy()
+
+    if 'Time' in df.columns:
+        df['Time_raw'] = df['Time']
+
     scaler = RobustScaler()
-    if 'Amount' in df.columns and 'Time' in df.columns:
-        df[['Time', 'Amount']] = scaler.fit_transform(df[['Time', 'Amount']])
-        
+    scale_columns = [column for column in ['Time', 'Amount'] if column in df.columns]
+    if scale_columns:
+        df[scale_columns] = scaler.fit_transform(df[scale_columns])
+
     return df

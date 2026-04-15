@@ -6,11 +6,11 @@ A machine learning project that trains multiple models to detect fraudulent cred
 
 ### Dashboard Preview
 
-![Dashboard Screenshot](docs/image.png)
+![Dashboard Screenshot](docs/image-1.png)
 
 ### Prediction Result Preview
 
-![Prediction Screenshot](docs/image-1.png)
+![Prediction Screenshot](docs/image.png)
 
 ## Features
 

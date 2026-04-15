@@ -27,13 +27,30 @@ def evaluate_models(models, X_test, y_test):
         
     return results
 
+def select_best_model(results, metric_name):
+    best_name = None
+    best_score = float("-inf")
+
+    for model_name, metrics in results.items():
+        score = metrics.get(metric_name)
+        if isinstance(score, str):
+            continue
+        if score > best_score:
+            best_name = model_name
+            best_score = float(score)
+
+    if best_name is None:
+        raise ValueError(f"No model has a usable value for {metric_name}.")
+
+    return best_name, best_score
+
 def print_evaluation(results):
     """
     Print the evaluation metrics cleanly to demonstrate the Precision-Recall tradeoff.
     High recall catches fraud, High precision prevents false alarms.
     """
     print("\n" + "="*35)
-    print(" 📊 MODEL COMPARISON DASHBOARD")
+    print(" MODEL COMPARISON DASHBOARD")
     print("="*35)
     
     for name, metrics in results.items():

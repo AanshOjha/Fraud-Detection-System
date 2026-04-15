@@ -4,17 +4,15 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 import xgboost as xgb
 
-def train_models(X_train, y_train):
+def train_models(X_train, y_train, random_state=42):
     """
     Train a baseline model and powerful ensembles to compare them.
     Includes class weights for handling the inherent fraud imbalance natively.
     """
-    # Since we used SMOTE to balance the data 50/50, we MUST NOT use class weights!
-    # Double-weighting causes the model to become overly-paranoid, leading to low Precision.
     models = {
-        "Logistic Regression": LogisticRegression(max_iter=1000, random_state=42),
-        "Random Forest": RandomForestClassifier(n_estimators=100, max_depth=12, random_state=42),
-        "XGBoost": xgb.XGBClassifier(n_estimators=100, max_depth=8, random_state=42, eval_metric='logloss')
+        "Logistic Regression": LogisticRegression(max_iter=1000, random_state=random_state),
+        "Random Forest": RandomForestClassifier(n_estimators=100, max_depth=12, random_state=random_state),
+        "XGBoost": xgb.XGBClassifier(n_estimators=100, max_depth=8, random_state=random_state, eval_metric='logloss')
     }
     
     trained_models = {}

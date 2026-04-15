@@ -1,0 +1,38 @@
+{
+  "data": {
+    "source_csv": "data/creditcard.csv",
+    "batch_dir": "data/raw/batches"
+  },
+  "simulation": {
+    "bootstrap_batch_count": 6,
+    "sample_rows": 60000
+  },
+  "training": {
+    "test_size": 0.2,
+    "random_state": 42,
+    "max_batches": null,
+    "balance_with_smote": true
+  },
+  "selection": {
+    "primary_metric": "ROC-AUC"
+  },
+  "promotion": {
+    "metric": "F1-Score",
+    "minimum_improvement": 0.0,
+    "minimum_recall": 0.7,
+    "auto_promote": true
+  },
+  "deployment": {
+    "candidate_model_path": "models/latest_candidate.pkl",
+    "candidate_metrics_path": "models/latest_training_metrics.json",
+    "production_model_path": "models/production_model.pkl",
+    "production_metrics_path": "models/production_metrics.json",
+    "metadata_path": "deployment/production.json"
+  },
+  "mlflow": {
+    "enabled": true,
+    "tracking_uri": "sqlite:///mlflow.db",
+    "experiment_name": "credit-card-fraud-detection",
+    "registered_model_name": "fraud-detection-model"
+  }
+}
